@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+# Author: Sankalp Singh Bais (bash.sankalp@gmail.com)
+# Source: https://grafana.com/docs/grafana/latest/setup-grafana/installation/docker/
+services:
+  # init_perms:
+    # image: grafana/grafana-enterprise
+    # user: root
+    # entrypoint: ["/bin/sh","-c","chown -R 65534:65534 /prometheus"]
+    # volumes:
+    #   - "/srv/grafana:/var/lib/grafana"
+
+# docker run -d --name=grafana -p 3000:3000 grafana/grafana-enterprise
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    # depends_on:
+    #   - init_perms
+    ports:
+      - 3000:3000
+    # volumes:
+      # - "/srv/grafana/:/var/lib/grafana"
+      # - "/srv/prometheus:/etc/prometheus:ro"
+    restart: unless-stopped
