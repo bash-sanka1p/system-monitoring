@@ -1,0 +1,19 @@
+# targets.yml
+# Target file for Prometheus file-based service discovery
+# Each entry defines a group of targets (hosts) and optional labels.
+
+- targets:
+    - node1.example.com:9100 # can specify multiple targets
+    - node2.example.com:9100
+  labels: # Custom labels for identification
+    job: node_exporter
+    type: server
+    deployed_site: on_premises
+    label_n: value_n
+
+- targets:
+    - node99.example.com:9100
+  labels: # Custom labels for identification
+    job: node_exporter
+    type: rpi
+    deployed_site: x

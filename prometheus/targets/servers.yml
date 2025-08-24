@@ -1,0 +1,7 @@
+- targets:
+    - server01.example.com:9100
+    - server02.example.com:9100
+  labels: 
+    job: node_exporter
+    type: servers
+    deployed_site: on_premises

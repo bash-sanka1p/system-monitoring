@@ -1,0 +1,8 @@
+# Modify below accordingly; Format will be same as targets.example.yaml
+- targets:
+    - 10.10.10.1:9100
+    - 10.10.10.2:9100
+  labels:
+    job: node_exporter
+    type: raspberry_pi
+    deployed_site: client_a
