@@ -1,19 +1,13 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
 # Author: Sankalp Singh Bais (bash.sankalp@gmail.com)
 # Source: https://prometheus.io/docs/prometheus/latest/installation/
-services:
-  init_perms:
-    image: prom/prometheus:v3.5.0
-    user: root
-    entrypoint: ["/bin/sh","-c","chown -R 65534:65534 /prometheus"]
-    volumes:
-      - "/srv/prometheus/data:/prometheus"
+# NOTE: Run below command to setup permissions of the host directory
+# sudo mkdir -p /srv/prometheus/data && sudo chown -R 65534:65534 /srv/prometheus/data
 
+services:
   prometheus:
     image: prom/prometheus:v3.5.0
     container_name: prometheus
-    depends_on:
-      - init_perms
     ports:
       - 9090:9090
     volumes:
