@@ -15,11 +15,11 @@ fi
 
 # Download node_exporter from github
 URL="https://github.com/prometheus/node_exporter/releases/download/v$NODE_EXPORTER_VERSION/node_exporter-$NODE_EXPORTER_VERSION.linux-$ARCH.tar.gz"
-echo "Downloading node_exporter... "
+echo "[+] Downloading node_exporter... "
 wget -q --show-progress "$URL" -O "/tmp/node_exporter-$NODE_EXPORTER_VERSION.tar.gz"
 
 if [ $? -ne 0 ]; then
-    echo "Failed to download node_exporter from $URL"
+    echo "[-] Failed to download node_exporter from $URL"
     exit 1
 fi
 
@@ -30,14 +30,17 @@ chmod +x node_exporter
 mv node_exporter /usr/local/bin
 
 # Create node_exporter user if it does not exist
+echo "[+] Creating user for node_exporter"
 if ! id -u node_exporter >/dev/null 2>&1; then
     useradd --no-create-home --shell /bin/false node_exporter
 fi
 
 # Set ownership
+echo "[+] Setting up permissions"
 chown node_exporter:node_exporter /usr/local/bin/node_exporter
 
 # Create systemd service file
+echo "[+] Creating systemd service"
 cat > /etc/systemd/system/node_exporter.service <<EOF
 [Unit]
 Description=Node Exporter
@@ -58,5 +61,5 @@ EOF
 systemctl daemon-reload
 systemctl enable --now node_exporter
 
-echo "Node Exporter has been installed and started successfully."
-echo "Check service status with: systemctl status node_exporter"
+echo "[+] Node Exporter has been installed and started successfully."
+echo "[+] Check service status with: systemctl status node_exporter"
