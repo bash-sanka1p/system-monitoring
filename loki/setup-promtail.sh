@@ -19,30 +19,38 @@ echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stab
 echo "[+] Installing promtail"
 apt update && apt-get install promtail -y
 
-echo "[+] Creating Sample config at /etc/promtail/config.yml"
+# Creating directory to store promtail positions file
+mkdir -p /var/lib/promtail && chown -R promtail /var/lib/promtail
 
+echo "[+] Creating Sample config at /etc/promtail/config.yml"
 cat > /etc/promtail/config.yml << EOF
 server:
   http_listen_port: 9080
   grpc_listen_port: 0
 
 positions:
-  filename: /tmp/positions.yaml
+  filename: /var/lib/promtail/positions.yaml
 
 clients:
   - url: http://loki.server:3100/loki/api/v1/push # replace with the url of your loki server
 
-scrape_configs:
-- job_name: system
-  static_configs:
-  - targets:
+scrape_configs: # Modify accordingly
+  - job_name: system
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: varlogs
+        __path__: /var/log/*log
+
+  - job_name: custom-app-log
+    static_configs:
+    - targets:
       - localhost
-    labels:
-      job: varlogs
-      __path__: /var/log/*log
-      stream: stdout
+      labels:
+        job: custom-app
+        __path__: /path/to/your/custom*.log
 EOF
 
 echo "[!] Modify /etc/promtail/config.yml for server URL and Scrape Configs"
-
-echo "[+] Installtion Finished."
+echo "[+] Installation Finished."
