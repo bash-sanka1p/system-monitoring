@@ -9,6 +9,7 @@ services:
     image: grafana/grafana-enterprise
     container_name: grafana
     environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_SECURITY_ADMIN_PASSWORD=Aur0r@
       - TZ=Asia/Kolkata
     ports:

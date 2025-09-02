@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+# Author: Sankalp Singh Bais (bash.sankalp@gmail.com)
+
+# References:
+# https://grafana.com/docs/loki/latest/setup/install/docker/#install-with-docker-on-linux
+# https://grafana.com/docs/loki/latest/get-started/architecture/
+# https://grafana.com/docs/loki/latest/get-started/components/
+# https://grafana.com/docs/loki/latest/reference/loki-http-api/
+# https://docs.docker.com/reference/compose-file/fragments/
+# https://medium.com/@vladkens/docker-compose-templating-using-yaml-merge-feature-1b73ee11c4a
+
+# NOTE: Make sure /srv/loki/data is owned by UID:GID 10001:10001. Run below command to set it up
+# sudo mkdir -p /srv/loki/data && sudo chown -R 10001:10001 /srv/loki/data
+
+services:
+  # Reverse proxy to route API requests (required for SSD Method)
+  nginx:
+    image: nginx:1.29.1-alpine3.22
+    container_name: loki-nginx
+    ports:
+      - "3100:80"
+    volumes:
+      - /srv/loki/nginx.conf:/etc/nginx/nginx.conf:ro  # Mount NGINX config
+    networks: &loki-network
+      - loki-internal-network
+    restart: unless-stopped
+
+  # Write target: Handles log ingestion
+  loki-write:
+    image: &loki-image grafana/loki:3.5.3
+    container_name: loki-write # These container names are important as they are used in nginx.conf
+    command: -target=write -config.file=/etc/loki/loki-config.yaml
+    volumes: &loki-mounts
+      - /srv/loki/data:/loki
+      - /srv/loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+    networks: *loki-network
+    restart: unless-stopped
+    depends_on:
+      - nginx
+
+  # Read target: Handles queries
+  loki-read:
+    image: *loki-image
+    container_name: loki-read
+    command: -target=read -config.file=/etc/loki/loki-config.yaml
+    volumes: *loki-mounts
+    networks: *loki-network
+    restart: unless-stopped
+    depends_on:
+      - nginx
+
+  # Backend target: Handles compaction, rules, etc.
+  loki-backend:
+    image: *loki-image
+    container_name: loki-backend
+    command: -target=backend -config.file=/etc/loki/loki-config.yaml
+    volumes: *loki-mounts
+    networks: *loki-network
+    restart: unless-stopped
+    depends_on:
+      - nginx
+
+# Networks for internal communication
+networks:
+  loki-internal-network:
