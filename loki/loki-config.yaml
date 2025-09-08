@@ -1,77 +1,77 @@
+# Common Config file for all loki targets.
+# Author: Sankalp Singh Bais (bash.sankalp@gmail.com)
 # References :
 # https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/docker/config/loki.yaml
 # https://raw.githubusercontent.com/grafana/loki/refs/heads/main/cmd/loki/loki-docker-config.yaml
+# https://grafana.com/docs/loki/latest/configure/
 # https://grafana.com/docs/loki/latest/get-started/components/
+# https://grafana.com/docs/loki/latest/configure/storage/
+
 
 auth_enabled: false
 
-server:
-  # http_listen_address: 0.0.0.0
+# https://grafana.com/docs/loki/latest/configure/#server
+server: # server configuration
+  # http_listen_address: 0.0.0.0 # Dont uncomment if using docker compose SSD mode.
   # grpc_listen_address: 0.0.0.0
 
   http_listen_port: 3100
   grpc_listen_port: 9095
-  log_level: info
+  log_level: warn
 
+# https://grafana.com/docs/loki/latest/configure/#common
 common:
-  # instance_addr: 0.0.0.0
-  compactor_address: http://loki-backend:3100
+  # instance_addr: 0.0.0.0 # let it autodetect
+  compactor_address: http://loki-backend:3100 # change if running compactor separately
   path_prefix: /loki
   replication_factor: 1
+  storage:
+    filesystem:  # can be set to filesystem, s3, gcs, azure
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
   ring: #This is how loki discovers peers;
     kvstore:
       # store: inmemory # inmemory wont be shared accorss containers and will cause failure in SSD method
       store: memberlist # Configured below
 
 
-# storage_config:
-#   filesystem:
-#     chunks_directory: /loki/chunks
-#     rules_directory: /loki/rules
-
-# Configuring memberlist
-memberlist:
-  join_members: ["loki-read", "loki-write", "loki-backend"]
-  bind_addr: ['0.0.0.0']
+# https://grafana.com/docs/loki/latest/configure/#memberlist
+memberlist: # Configuring memberlist
+  join_members:
+    - "loki-backend"
+    - "loki-read"
+    - "loki-write"
+  bind_addr:
+    - 0.0.0.0
   bind_port: 7946
   gossip_interval: 2s
 
 
-# compactor:
-#   compactor_grpc_address: loki-backend:3100
-
-# query_range:
-#   results_cache:
-#     cache:
-#       embedded_cache:
-#         enabled: true
-#         max_size_mb: 100
-
-# limits_config:
-#   metric_aggregation_enabled: true
-#   enable_multi_variant_queries: true
-
-schema_config:
+# https://grafana.com/docs/loki/latest/configure/#schema_config
+# https://grafana.com/docs/loki/latest/configure/#period_config
+schema_config: # Defines how logs are stored and indexed
   configs:
-    - from: 2020-10-24
+    - from: 2022-08-07
       store: tsdb
-      object_store: filesystem
+      object_store: filesystem  # storage for chunks
       schema: v13
       index:
         prefix: index_
-        period: 24h
+        period: 24h # must be 24 hours
 
-# pattern_ingester:
-#   enabled: true
-#   metric_aggregation:
-#     # loki_address: localhost:3100
-#     loki_address: loki-write:3100
 
-# ruler:
-#   alertmanager_url: http://localhost:9093
-
-# frontend:
-#   encoding: protobuf
+# https://grafana.com/docs/loki/latest/configure/#compactor
+compactor: # Manages log retention and index compaction. Preferably run a single instance of this.
+  retention_enabled: true
+  working_directory: /loki/retention
+  compaction_interval: 10m
+  retention_delete_delay: 2h
+  retention_delete_worker_count: 150
+  delete_request_store: filesystem
 
 analytics:
   reporting_enabled: false
+
+####### Other confiuration options #######
+# limits_config: # sets operational limits to prevent overload and manager resources
+# https://grafana.com/docs/loki/latest/configure/#limits_config
