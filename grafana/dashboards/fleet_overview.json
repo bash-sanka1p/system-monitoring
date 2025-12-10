@@ -1,0 +1,1282 @@
+{
+    "__inputs": [
+        {
+            "name": "DS_PROMETHEUS",
+            "label": "prometheus",
+            "description": "",
+            "type": "datasource",
+            "pluginId": "prometheus",
+            "pluginName": "Prometheus"
+        }
+    ],
+    "__elements": {},
+    "__requires": [
+        {
+            "type": "grafana",
+            "id": "grafana",
+            "name": "Grafana",
+            "version": "12.3.0"
+        },
+        {
+            "type": "datasource",
+            "id": "prometheus",
+            "name": "Prometheus",
+            "version": "1.0.0"
+        },
+        {
+            "type": "panel",
+            "id": "stat",
+            "name": "Stat",
+            "version": ""
+        },
+        {
+            "type": "panel",
+            "id": "table",
+            "name": "Table",
+            "version": ""
+        }
+    ],
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "description": "Overview of all the on client basis",
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [],
+    "panels": [
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+            },
+            "description": "Count of total devices in current selection",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            }
+                        ]
+                    },
+                    "unit": "none"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 0,
+                "y": 0
+            },
+            "id": 4,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showPercentChange": false,
+                "text": {
+                    "titleSize": 1
+                },
+                "textMode": "auto",
+                "wideLayout": true
+            },
+            "pluginVersion": "12.3.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "expr": "count(\r\n  up{\r\n    job=\"node_exporter\",\r\n    deployed_site=~\"$site\",\r\n    type=~\"$type\",\r\n    name=~\"$device\"\r\n  }\r\n)\r\n",
+                    "legendFormat": "__auto",
+                    "range": true,
+                    "refId": "A"
+                }
+            ],
+            "title": "Total In Current Selection",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "center",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "filterable": false,
+                        "footer": {
+                            "reducers": []
+                        },
+                        "inspect": false,
+                        "minWidth": 100,
+                        "wrapHeaderText": true,
+                        "wrapText": true
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 7,
+                "x": 4,
+                "y": 0
+            },
+            "id": 2,
+            "options": {
+                "cellHeight": "sm",
+                "enablePagination": false,
+                "frozenColumns": {},
+                "showHeader": true,
+                "sortBy": []
+            },
+            "pluginVersion": "12.3.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "count by (type) (\r\n  up{\r\n    job=\"node_exporter\",\r\n    deployed_site=~\".*\",\r\n    type=~\".*\",\r\n    name=~\".*\"\r\n  }\r\n)\r\n",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "total_by_type"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "sum by (type) (\r\n  up{\r\n    job=\"node_exporter\",\r\n    deployed_site=~\".*\",\r\n    type=~\".*\",\r\n    name=~\".*\"\r\n  }\r\n)\r\n",
+                    "format": "table",
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "active_by_type"
+                }
+            ],
+            "title": "Devices By Type",
+            "transformations": [
+                {
+                    "id": "joinByField",
+                    "options": {
+                        "byField": "type",
+                        "mode": "outer"
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true,
+                            "Time 1": true,
+                            "Time 2": true,
+                            "reach_stackers": false
+                        },
+                        "includeByName": {},
+                        "indexByName": {},
+                        "renameByName": {
+                            "Time 1": "",
+                            "Value #active_by_type": "Active",
+                            "Value #total_by_type": "Total",
+                            "reach_stackers": "",
+                            "type": "Device Type"
+                        }
+                    }
+                },
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Inactive",
+                        "binary": {
+                            "left": {
+                                "matcher": {
+                                    "id": "byName",
+                                    "options": "Total"
+                                }
+                            },
+                            "operator": "-",
+                            "right": {
+                                "matcher": {
+                                    "id": "byName",
+                                    "options": "Active"
+                                }
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        },
+                        "replaceFields": false
+                    }
+                }
+            ],
+            "type": "table"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "center",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "footer": {
+                            "reducers": []
+                        },
+                        "inspect": false,
+                        "minWidth": 100,
+                        "wrapHeaderText": true,
+                        "wrapText": true
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 8,
+                "x": 11,
+                "y": 0
+            },
+            "id": 3,
+            "options": {
+                "cellHeight": "sm",
+                "showHeader": true
+            },
+            "pluginVersion": "12.3.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "count by (deployed_site) (\r\n  up{\r\n    job=\"node_exporter\",\r\n    deployed_site=~\".*\",\r\n    type=\"reach_stackers\",\r\n    name=~\".*\"\r\n  }\r\n)\r\n",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "total_rs_per_site"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "sum by (deployed_site) (\r\n  up{\r\n    job=\"node_exporter\",\r\n    deployed_site=~\".*\",\r\n    type=\"reach_stackers\",\r\n    name=~\".*\"\r\n  }\r\n)\r\n",
+                    "format": "table",
+                    "instant": true,
+                    "range": false,
+                    "refId": "active_rs_per_site"
+                }
+            ],
+            "title": "Reachstackers Per Site",
+            "transformations": [
+                {
+                    "id": "joinByField",
+                    "options": {
+                        "byField": "deployed_site",
+                        "mode": "outer"
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time 1": true,
+                            "Time 2": true
+                        },
+                        "includeByName": {},
+                        "indexByName": {},
+                        "renameByName": {
+                            "Value #active_rs_per_site": "Active",
+                            "Value #total_rs_per_site": "Total"
+                        }
+                    }
+                },
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Inactive",
+                        "binary": {
+                            "left": {
+                                "matcher": {
+                                    "id": "byName",
+                                    "options": "Total"
+                                }
+                            },
+                            "operator": "-",
+                            "right": {
+                                "matcher": {
+                                    "id": "byName",
+                                    "options": "Active"
+                                }
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        },
+                        "replaceFields": false
+                    }
+                }
+            ],
+            "type": "table"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+            },
+            "description": "Count of Active devices in current selection",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            }
+                        ]
+                    },
+                    "unit": "none"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 0,
+                "y": 3
+            },
+            "id": 5,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showPercentChange": false,
+                "text": {
+                    "titleSize": 1
+                },
+                "textMode": "auto",
+                "wideLayout": true
+            },
+            "pluginVersion": "12.3.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(\r\n  up{\r\n    job=\"node_exporter\",\r\n    deployed_site=~\"$site\",\r\n    type=~\"$type\",\r\n    name=~\"$device\"\r\n  }\r\n)\r\n",
+                    "legendFormat": "__auto",
+                    "range": true,
+                    "refId": "A"
+                }
+            ],
+            "title": "Active In Current Selection",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "center",
+                        "cellOptions": {
+                            "mode": "lcd",
+                            "type": "gauge",
+                            "valueDisplayMode": "color"
+                        },
+                        "filterable": true,
+                        "footer": {
+                            "reducers": []
+                        },
+                        "inspect": false,
+                        "wrapHeaderText": true,
+                        "wrapText": true
+                    },
+                    "decimals": 1,
+                    "links": [],
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Device"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "type": "auto"
+                                }
+                            },
+                            {
+                                "id": "custom.width",
+                                "value": 177
+                            },
+                            {
+                                "id": "links",
+                                "value": [
+                                    {
+                                        "title": "Go To Device Details",
+                                        "url": "/d/ff08t6kfrrytcc/device-details?var-site=${__data.fields._site}&var-type=${__data.fields._type}&var-device=${__value.text}\r\n"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Status"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "type": "color-text"
+                                }
+                            },
+                            {
+                                "id": "mappings",
+                                "value": [
+                                    {
+                                        "options": {
+                                            "0": {
+                                                "color": "red",
+                                                "index": 0,
+                                                "text": "DOWN"
+                                            },
+                                            "1": {
+                                                "color": "green",
+                                                "index": 1,
+                                                "text": "UP"
+                                            }
+                                        },
+                                        "type": "value"
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "custom.width",
+                                "value": 79
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "CPU %"
+                        },
+                        "properties": [
+                            {
+                                "id": "unit",
+                                "value": "percent"
+                            },
+                            {
+                                "id": "min",
+                                "value": 0
+                            },
+                            {
+                                "id": "max",
+                                "value": 100
+                            },
+                            {
+                                "id": "thresholds",
+                                "value": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": 0
+                                        },
+                                        {
+                                            "color": "#EAB839",
+                                            "value": 70
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 85
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "MEM %"
+                        },
+                        "properties": [
+                            {
+                                "id": "unit",
+                                "value": "percent"
+                            },
+                            {
+                                "id": "min",
+                                "value": 0
+                            },
+                            {
+                                "id": "max",
+                                "value": 100
+                            },
+                            {
+                                "id": "thresholds",
+                                "value": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": 0
+                                        },
+                                        {
+                                            "color": "#EAB839",
+                                            "value": 75
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 85
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Temperature"
+                        },
+                        "properties": [
+                            {
+                                "id": "unit",
+                                "value": "celsius"
+                            },
+                            {
+                                "id": "thresholds",
+                                "value": {
+                                    "mode": "percentage",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": 0
+                                        },
+                                        {
+                                            "color": "#EAB839",
+                                            "value": 60
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "custom.width",
+                                "value": 120
+                            },
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "type": "color-text"
+                                }
+                            },
+                            {
+                                "id": "thresholds",
+                                "value": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": 0
+                                        },
+                                        {
+                                            "color": "yellow",
+                                            "value": 60
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 80
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Disk % (/)"
+                        },
+                        "properties": [
+                            {
+                                "id": "unit",
+                                "value": "percent"
+                            },
+                            {
+                                "id": "min",
+                                "value": 0
+                            },
+                            {
+                                "id": "max",
+                                "value": 100
+                            },
+                            {
+                                "id": "thresholds",
+                                "value": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": 0
+                                        },
+                                        {
+                                            "color": "#EAB839",
+                                            "value": 70
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 90
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Last Seen (ago)"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "type": "color-text"
+                                }
+                            },
+                            {
+                                "id": "unit",
+                                "value": "dtdhms"
+                            },
+                            {
+                                "id": "custom.width",
+                                "value": 118
+                            },
+                            {
+                                "id": "thresholds",
+                                "value": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {
+                                            "color": "green",
+                                            "value": 0
+                                        },
+                                        {
+                                            "color": "#EAB839",
+                                            "value": 60
+                                        },
+                                        {
+                                            "color": "red",
+                                            "value": 300
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "mappings",
+                                "value": [
+                                    {
+                                        "options": {
+                                            "match": "null+nan",
+                                            "result": {
+                                                "color": "dark-red",
+                                                "index": 0,
+                                                "text": "Unknown"
+                                            }
+                                        },
+                                        "type": "special"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "_site"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "type": "color-text"
+                                }
+                            },
+                            {
+                                "id": "custom.hideFrom.viz",
+                                "value": true
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "_type"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "type": "color-text"
+                                }
+                            },
+                            {
+                                "id": "custom.hideFrom.viz",
+                                "value": true
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Uptime"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "type": "color-text"
+                                }
+                            },
+                            {
+                                "id": "unit",
+                                "value": "dtdhms"
+                            },
+                            {
+                                "id": "custom.width",
+                                "value": 108
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 35,
+                "w": 24,
+                "x": 0,
+                "y": 6
+            },
+            "id": 1,
+            "options": {
+                "cellHeight": "sm",
+                "enablePagination": false,
+                "frozenColumns": {},
+                "showHeader": true,
+                "sortBy": []
+            },
+            "pluginVersion": "12.3.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "up{job=\"node_exporter\", deployed_site=~\"$site\", type=~\"$type\", name=~\"$device\"}\r\n",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "status"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "time()\r\n-\r\nmax_over_time(\r\n  timestamp(\r\n    up{job=\"node_exporter\", deployed_site=~\"$site\", type=~\"$type\", name=~\"$device\"} == 1\r\n  )[48h:]\r\n)\r\n",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "last_seen"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "time() - node_boot_time_seconds{\r\n  job=\"node_exporter\",\r\n  deployed_site=~\"$site\",\r\n  type=~\"$type\",\r\n  name=~\"$device\"\r\n}",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "uptime"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "100 - (\r\n  avg by (name) (\r\n    irate(node_cpu_seconds_total{\r\n      job=\"node_exporter\",\r\n      deployed_site=~\"$site\",\r\n      type=~\"$type\",\r\n      name=~\"$device\",\r\n      mode=\"idle\"\r\n    }[5m])\r\n  ) * 100\r\n)\r\n",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "cpu_percent"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "100 * (\r\n  1 - (\r\n    node_memory_MemAvailable_bytes{\r\n      job=\"node_exporter\",\r\n      deployed_site=~\"$site\",\r\n      type=~\"$type\",\r\n      name=~\"$device\"\r\n    }\r\n    /\r\n    node_memory_MemTotal_bytes{\r\n      job=\"node_exporter\",\r\n      deployed_site=~\"$site\",\r\n      type=~\"$type\",\r\n      name=~\"$device\"\r\n    }\r\n  )\r\n)\r\n",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "mem_percent"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "100 * (\r\n  1 - (\r\n    node_filesystem_avail_bytes{\r\n      job=\"node_exporter\",\r\n      deployed_site=~\"$site\",\r\n      type=~\"$type\",\r\n      name=~\"$device\",\r\n      mountpoint=\"/\",\r\n      fstype!~\"tmpfs|overlay\"\r\n    }\r\n    /\r\n    node_filesystem_size_bytes{\r\n      job=\"node_exporter\",\r\n      deployed_site=~\"$site\",\r\n      type=~\"$type\",\r\n      name=~\"$device\",\r\n      mountpoint=\"/\",\r\n      fstype!~\"tmpfs|overlay\"\r\n    }\r\n  )\r\n)\r\n",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "disk_percent"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "max by (name) (\r\n  node_hwmon_temp_celsius{\r\n    job=\"node_exporter\",\r\n    deployed_site=~\"$site\",\r\n    type=~\"$type\",\r\n    name=~\"$device\"\r\n  }\r\n)\r\n",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "temperature"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "gps_connected"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "rtk"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "gw_latency"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "${DS_PROMETHEUS}"
+                    },
+                    "editorMode": "code",
+                    "exemplar": false,
+                    "expr": "",
+                    "format": "table",
+                    "hide": false,
+                    "instant": true,
+                    "legendFormat": "__auto",
+                    "range": false,
+                    "refId": "nw_latency"
+                }
+            ],
+            "title": "Device Overview",
+            "transformations": [
+                {
+                    "id": "joinByField",
+                    "options": {
+                        "byField": "name",
+                        "mode": "outer"
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true,
+                            "Time 1": true,
+                            "Time 2": true,
+                            "Time 3": true,
+                            "Time 4": true,
+                            "Time 5": true,
+                            "Time 6": true,
+                            "Time 7": true,
+                            "Value #last_seen": false,
+                            "Value #mem_percent": false,
+                            "__name__": true,
+                            "deployed_site": false,
+                            "deployed_site 1": false,
+                            "deployed_site 2": true,
+                            "deployed_site 3": true,
+                            "deployed_site 4": true,
+                            "deployed_site 5": true,
+                            "device": true,
+                            "fstype": true,
+                            "instance": true,
+                            "instance 1": true,
+                            "instance 2": true,
+                            "instance 3": true,
+                            "instance 4": true,
+                            "instance 5": true,
+                            "job": true,
+                            "job 1": true,
+                            "job 2": true,
+                            "job 3": true,
+                            "job 4": true,
+                            "job 5": true,
+                            "mountpoint": true,
+                            "type": false,
+                            "type 1": false,
+                            "type 2": true,
+                            "type 3": true,
+                            "type 4": true,
+                            "type 5": true
+                        },
+                        "includeByName": {},
+                        "indexByName": {
+                            "Time 1": 1,
+                            "Time 2": 8,
+                            "Time 3": 15,
+                            "Time 4": 17,
+                            "Time 5": 23,
+                            "Time 6": 32,
+                            "Time 7": 38,
+                            "Value #cpu_percent": 16,
+                            "Value #disk_percent": 31,
+                            "Value #last_seen": 13,
+                            "Value #mem_percent": 22,
+                            "Value #status": 7,
+                            "Value #temperature": 33,
+                            "Value #uptime": 14,
+                            "__name__": 2,
+                            "deployed_site 1": 3,
+                            "deployed_site 2": 9,
+                            "deployed_site 3": 18,
+                            "deployed_site 4": 24,
+                            "deployed_site 5": 34,
+                            "device": 25,
+                            "fstype": 26,
+                            "instance 1": 4,
+                            "instance 2": 10,
+                            "instance 3": 19,
+                            "instance 4": 27,
+                            "instance 5": 35,
+                            "job 1": 5,
+                            "job 2": 11,
+                            "job 3": 20,
+                            "job 4": 28,
+                            "job 5": 36,
+                            "mountpoint": 29,
+                            "name": 0,
+                            "type 1": 6,
+                            "type 2": 12,
+                            "type 3": 21,
+                            "type 4": 30,
+                            "type 5": 37
+                        },
+                        "orderBy": [],
+                        "orderByMode": "manual",
+                        "renameByName": {
+                            "Time": "",
+                            "Time 3": "",
+                            "Time 6": "",
+                            "Value": "Status",
+                            "Value #A": "Status",
+                            "Value #B": "CPU %",
+                            "Value #C": "MEM %",
+                            "Value #cpu_percent": "CPU %",
+                            "Value #disk_percent": "Disk % (/)",
+                            "Value #last_seen": "Last Seen (ago)",
+                            "Value #mem_percent": "MEM %",
+                            "Value #status": "Status",
+                            "Value #temperature": "Temperature",
+                            "Value #uptime": "Uptime",
+                            "__name__": "",
+                            "deployed_site": "_site",
+                            "deployed_site 1": "_site",
+                            "device": "",
+                            "fstype": "",
+                            "instance 1": "",
+                            "job": "",
+                            "job 1": "",
+                            "name": "Device",
+                            "type": "_type",
+                            "type 1": "_type"
+                        }
+                    }
+                },
+                {
+                    "id": "sortBy",
+                    "options": {
+                        "fields": {},
+                        "sort": [
+                            {
+                                "desc": false,
+                                "field": "Device"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "type": "table"
+        }
+    ],
+    "preload": false,
+    "refresh": "5s",
+    "schemaVersion": 42,
+    "tags": [],
+    "templating": {
+        "list": [
+            {
+                "allowCustomValue": false,
+                "current": {},
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_PROMETHEUS}"
+                },
+                "definition": "label_values(up{job=\"node_exporter\"}, deployed_site)",
+                "includeAll": true,
+                "multi": true,
+                "name": "site",
+                "options": [],
+                "query": {
+                    "qryType": 5,
+                    "query": "label_values(up{job=\"node_exporter\"}, deployed_site)",
+                    "refId": "PrometheusVariableQueryEditor-VariableQuery"
+                },
+                "refresh": 1,
+                "regex": "",
+                "sort": 1,
+                "type": "query"
+            },
+            {
+                "allowCustomValue": false,
+                "current": {},
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_PROMETHEUS}"
+                },
+                "definition": "label_values(up{job=\"node_exporter\", deployed_site=~\"$site\"}, type)",
+                "includeAll": true,
+                "multi": true,
+                "name": "type",
+                "options": [],
+                "query": {
+                    "qryType": 5,
+                    "query": "label_values(up{job=\"node_exporter\", deployed_site=~\"$site\"}, type)",
+                    "refId": "PrometheusVariableQueryEditor-VariableQuery"
+                },
+                "refresh": 2,
+                "regex": "",
+                "type": "query"
+            },
+            {
+                "allowCustomValue": false,
+                "current": {},
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_PROMETHEUS}"
+                },
+                "definition": "label_values(up{job=\"node_exporter\", deployed_site=~\"$site\", type=~\"$type\"}, name)",
+                "includeAll": true,
+                "multi": true,
+                "name": "device",
+                "options": [],
+                "query": {
+                    "qryType": 5,
+                    "query": "label_values(up{job=\"node_exporter\", deployed_site=~\"$site\", type=~\"$type\"}, name)",
+                    "refId": "PrometheusVariableQueryEditor-VariableQuery"
+                },
+                "refresh": 2,
+                "regex": "",
+                "sort": 1,
+                "type": "query"
+            }
+        ]
+    },
+    "time": {
+        "from": "now-1h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Fleet Overview",
+    "uid": "bf6hiu9qbh6v4c",
+    "version": 29,
+    "weekStart": "",
+    "id": null
+}
