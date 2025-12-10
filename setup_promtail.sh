@@ -23,7 +23,7 @@ apt update && apt-get install promtail -y
 mkdir -p /var/lib/promtail && chown -R promtail /var/lib/promtail
 
 echo "[+] Creating Sample config at /etc/promtail/config.yml"
-cat > /etc/promtail/config.yml << EOF
+cat > /etc/promtail/config.yml << 'EOF'
 server:
   http_listen_port: 9080
   grpc_listen_port: 0
@@ -41,6 +41,8 @@ scrape_configs: # Modify accordingly
         - localhost
       labels:
         job: varlogs
+        custom_label: custom_value
+        name: ${HOSTNAME}
         __path__: /var/log/*log
 
   - job_name: custom-app-log
@@ -49,8 +51,37 @@ scrape_configs: # Modify accordingly
       - localhost
       labels:
         job: custom-app
+        name: ${HOSTNAME}
+        custom_label: custom_value
         __path__: /path/to/your/custom*.log
 EOF
 
-echo "[!] Modify /etc/promtail/config.yml for server URL and Scrape Configs"
-echo "[+] Installation Finished."
+echo "[+] Configuring systemd service for hostname label support ..."
+cat > /etc/systemd/system/promtail.service << 'EOF'
+[Unit]
+Description=Promtail
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=promtail
+Environment="HOSTNAME=%H"
+ExecStart=/usr/bin/promtail -config.expand-env=true -config.file=/etc/promtail/config.yml
+TimeoutSec=30
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+echo "[+] Reloading systemd and enabling promtail ..."
+systemctl daemon-reload
+systemctl enable --now promtail
+
+
+echo "[!] Modify /etc/promtail/config.yml for server URL and Scrape Configs."
+echo ""
+echo "[+] Installation Complete! Check status: systemctl status promtail"
+echo "[+] View logs: journalctl -u promtail -f"
